@@ -12,11 +12,11 @@ class Home(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Classic blog design'
+        context['title'] = 'Classic Blog Design'
         return context
 
 
-class PostByCategory(ListView):
+class PostsByCategory(ListView):
     template_name = 'blog/index.html'
     context_object_name = 'posts'
     paginate_by = 4
@@ -30,10 +30,20 @@ class PostByCategory(ListView):
         context['title'] = Category.objects.get(slug=self.kwargs['slug'])
         return context
 
-class PostByTag(ListView):
-    pass
 
+class PostsByTag(ListView):
+    template_name = 'blog/index.html'
+    context_object_name = 'posts'
+    paginate_by = 4
+    allow_empty = False
 
+    def get_queryset(self):
+        return Post.objects.filter(tags__slug=self.kwargs['slug'])
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Записи по тегу: ' + str(Tag.objects.get(slug=self.kwargs['slug']))
+        return context
 
 
 class GetPost(DetailView):
